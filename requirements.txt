@@ -1,0 +1,4 @@
+wolframclient
+pandas
+wolframalpha
+wordfreq
