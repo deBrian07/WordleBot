@@ -15,11 +15,17 @@ class WordleGame:
             raise ValueError('Guess must be a 5-letter word')
         if guess not in self.wordlist:
             return [0] * 5, False
-        
-        placed_letters = [1 if guess[i] == self.word[i] else 0 for i in range(5)]
-        correct_letters = [1 if guess[i] in self.word and guess[i] != self.word[i] else 0 for i in range(5)]
-        feedback = [2 if placed_letters[i] == 1 else correct_letters[i] for i in range(5)]
-        if placed_letters == [1] * 5:
+            
+        feedback = []
+        for i in range(5):
+            if guess[i] == self.word[i]:
+                feedback.append(2)  # Letter is correctly placed
+            elif guess[i] in self.word:
+                feedback.append(1)  # Letter is correct but not in the correct position
+            else:
+                feedback.append(0)  # Letter is incorrect
+            
+        if feedback == [2] * 5:
             return feedback, True
         return feedback, False
     
