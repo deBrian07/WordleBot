@@ -37,56 +37,79 @@ class Predictor:
         scores = list(scores)
         index = 0
         temp = self.wordList
+        # drop the last word since when predict() is called it means that the last word didn't work
+        temp = self.dropWord(temp, word)
         for score in self.scores:
             letter = word[index]
             match score:
                 case 0:
-                    if letter not in self.goodLetters and letter not in self.placedLetters:
+                    if letter not in self.goodLetters and letter not in self.placedLetters and len(temp) > 1:
                         temp = self.filterBadLetters(letter, temp)
                 case 1:
-                    if letter not in self.placedLetters:
                         temp = self.filterGoodLetters(letter, index, temp)
                 case 2:
-                    temp = self.filterPlacedLetters(letter, index, temp)
+                    if len(temp) > 1:
+                        temp = self.filterPlacedLetters(letter, index, temp)
+            
+            # print(f'CHECKING INDEX{index}')
+            # print(temp[:10])
             index += 1
+        
         return temp
 
     def filterBadLetters(self, letter, words):
         # filters out words with incorrect letters
-        result = words
-        a = 0  # row number
-        for i in result.index:
-            if (result.iloc[a].str.contains(letter).bool()):  # check if a dataframe does not contain bLetters
-                result = result.drop(labels=i, axis=0)
-                a -= 1  # deleted 1 row which means there's -1 row in total
-                # NOTE: dFrame word doesnt have all the index number, some are NaN, so the only way is to skip those index and do the .drop()
+        words = words.values.tolist()
+        word1 = list()
+        # result = words
+        # a = 0  # row number
+        # for i in result.index:
+        #     if (result.iloc[a].str.contains(letter).bool()):  # check if a dataframe does not contain bLetters
+        #         result = result.drop(labels=i, axis=0)
+        #         a -= 1  # deleted 1 row which means there's -1 row in total
+        #         # NOTE: dFrame word doesnt have all the index number, some are NaN, so the only way is to skip those index and do the .drop()
 
-            a += 1
-        return result
+        #     a += 1
+        # return result
+        for word in words:
+            if str(letter) not in word[0]:
+                word1.append(word)
+        return pd.DataFrame(word1, columns=['WORDS'])
 
     def filterGoodLetters(self, letter, index, words):
         # filters out words with good letters but in wrong place
         # check for good words
-        self.goodLetters.append(letter)
-        j = 0
-        i = 0
-        a = 0
         words = words.values.tolist()
         word1 = list()
         #words.reset_index()
         for word in words:
-            if (str(letter) in word[0] and (word[0].index(str(letter)) != index)):
+            if (str(letter) in word[0] and (word[0][index] != letter)):
                 word1.append(word)
+        self.goodLetters.append(letter)
         return pd.DataFrame(word1, columns=['WORDS'])
 
     def filterPlacedLetters(self, letter, index, words):
-        self.placedLetters.append(letter)
-        # self.goodLetters.append(letter)
+        if letter not in self.placedLetters:
+            self.goodLetters.append(letter)
         words = words.values.tolist()
         word1 = list()
         for word in words:
-            if letter in word[0] and word[0].index(str(letter)) == index:
+            # if word.count(letter) == 1:
+            #     if (letter in word[0]) and (word[0].index(str(letter)) == index):
+            #         word1.append(word)
+            #         runtime += 1
+            # else:
+            #     if (letter in word[0]) and ((word[0][word[0].index(str(letter)):].index(str(letter)) == index)):
+            #         word1.append(word)
+            #         runtime += 1
+            index = int(index)
+            if word[0][index] == letter:
                 word1.append(word)
+
+        
+        # if runtime == 0:
+        #     return pd.DataFrame(words, columns=['WORDS'])
+
         return pd.DataFrame(word1, columns=['WORDS'])
 
     def getSumPossibilities(self, word):
@@ -131,3 +154,8 @@ class Predictor:
                 resultWord = word[0]
                 self.uncertainty -= temp
         return resultWord
+
+    def dropWord(self, word_list, word):
+        # Drop the rows that match the given word
+        result = word_list[word_list.iloc[:,0] != word]
+        return result
