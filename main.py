@@ -2,7 +2,7 @@ import pandas as pd
 import predictor
 
 wordle_words = pd.read_csv(
-    'five-letter-words.csv')
+    'datasets/five-letter-words.csv')
 df = pd.DataFrame(wordle_words)
 wordList1 = df.values.tolist()
 wordList = []
@@ -14,7 +14,7 @@ def main():
     pred = predictor.Predictor()
     while(correct == False):
         if pred.trial == 0:
-            pred.word='crane'
+            pred.word='salet'
             print(pred.word) 
             # input
             a, b, c, d, e = map(int, input().split(' '))
