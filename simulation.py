@@ -1,8 +1,11 @@
 from wordle import WordleGame
 import predictor
+import matplotlib.pyplot as plt
+import numpy as np
 
-for i in range(100):
-    game = WordleGame("possible_words.csv")
+steps = []
+for i in range(1000):
+    game = WordleGame("datasets/possible_words.csv")
     pred = predictor.Predictor()
     print(f'Simulation #{i}: ')
     print(f'Actual word: {game.word}')
@@ -13,9 +16,29 @@ for i in range(100):
         word = pred.word
         print(f'Guess{pred.trial + 1}: {word}')
         scores, end = game.play(word)
-        print(f'Socres: {scores}')
+        score = []
+        for i in scores:
+            if i == 1:
+                score.append('🟨')
+            elif i == 0:
+                score.append('⬜️')
+            elif i == 2:
+                score.append('🟩')
+        print(f'Socres: {score}')
         if end == True:
             print(f'Tries: {pred.trial + 1}')
+            steps.append(pred.trial + 1)
             break
         pred.scores = scores
         word = pred.predict()
+
+print(f'AVERAGE STEPS: {np.mean(steps)}')
+
+# Creating Frequency Graph
+plt.hist(steps, bins=6)
+
+plt.xlabel('Values')
+plt.ylabel('Frequency')
+plt.title('Frequency Graph')
+
+plt.show()
