@@ -11,10 +11,8 @@ for i in range(1000):
     print(f'Actual word: {game.word}')
     word = str()
     while True:
-        if pred.trial == 0:
-            pred.word='crane'
-        word = pred.word
-        print(f'Guess{pred.trial + 1}: {word}')
+        word = pred.predict()
+        print(f'Guess{pred.trial}: {word}')
         scores, end = game.play(word)
         score = []
         for i in scores:
@@ -26,11 +24,10 @@ for i in range(1000):
                 score.append('🟩')
         print(f'Socres: {score}')
         if end == True:
-            print(f'Tries: {pred.trial + 1}')
-            steps.append(pred.trial + 1)
+            print(f'Tries: {pred.trial}')
+            steps.append(pred.trial)
             break
         pred.scores = scores
-        word = pred.predict()
 
 print(f'AVERAGE STEPS: {np.mean(steps)}')
 

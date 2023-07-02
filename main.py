@@ -13,17 +13,8 @@ correct = False
 def main():
     pred = predictor.Predictor()
     while(correct == False):
-        if pred.trial == 0:
-            pred.word='salet'
-            print(pred.word) 
-            # input
-            a, b, c, d, e = map(int, input().split(' '))
-            pred.scores = [a, b, c, d, e]
-            pred.trial += 1
-        else:
-            print(pred.predict())
-            a, b, c, d, e = map(int, input().split(' '))
-            pred.scores = [a, b, c, d, e]
-            pred.trial += 1
+        print(pred.predict())
+        a, b, c, d, e = map(int, input().split(' '))
+        pred.scores = [a, b, c, d, e]
 
 main()

@@ -7,13 +7,14 @@ from wordfreq import word_frequency
 class Predictor:
     def __init__(self):
         # self.wordle_words = pd.read_csv('five-letter-words.csv')
-        self.wordle_words = pd.read_csv("possible_words.csv")
+        self.wordle_words = pd.read_csv("datasets/possible_words.csv")
         self.df = pd.DataFrame(self.wordle_words)
         #self.wordList = self.df.values.tolist()
         self.wordList = self.df
         self.correct = False
         self.trial = 0
         self.word = str()
+        self.start_word = 'salet'
         self.scores = []
         self.wlSize = self.wordList.shape[0]
         self.goodLetters = []
@@ -21,6 +22,10 @@ class Predictor:
         self.placedLetters = []
 
     def predict(self):
+        if self.trial == 0:
+            self.word = self.start_word
+            self.trial += 1
+            return self.word
         self.wordList = self.generateFilteredList(self.scores, self.word)
 
         self.word = self.getWord()
@@ -131,12 +136,13 @@ class Predictor:
         # client = wolframalpha.Client('bobchenchenzhibo@gmail.com')
         # result = client.query(f'WordFrequencyData["{word}"]')
         # probability = result['FrequencyData']['TotalFrequency']
-        probability = float(word_frequency(word, 'en', wordlist='best', minimum=0.0))
-        if probability == 0:
+        frequency = float(word_frequency(word, 'en', wordlist='best', minimum=0.0))
+        if frequency == 0:
             return 0
         # calculate the entropy of the word
         entropy = 0
-        entropy += probability * math.log2(probability)
+        probability = 1.00 / len(self.wordList.values.tolist())
+        entropy += frequency * math.log2(float(1/probability))
         # session.terminate()
 
         return -entropy
