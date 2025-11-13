@@ -1,21 +1,46 @@
 from wordle import WordleGame
 import predictor
+import matplotlib.pyplot as plt
+import numpy as np
+from tqdm import tqdm
+import sys
 
-for i in range(100):
-    game = WordleGame("possible_words.csv")
-    pred = predictor.Predictor()
-    print(f'Simulation #{i}: ')
-    print(f'Actual word: {game.word}')
-    word = str()
-    while True:
-        if pred.trial == 0:
-            pred.word='crane'
-        word = pred.word
-        print(f'Guess{pred.trial + 1}: {word}')
-        scores, end = game.play(word)
-        print(f'Socres: {scores}')
-        if end == True:
-            print(f'Tries: {pred.trial + 1}')
-            break
-        pred.scores = scores
-        word = pred.predict()
+EPOCHS = 10000
+
+steps = []
+with tqdm(total=EPOCHS, ncols=80) as pbar:
+    for i in range(EPOCHS):
+        game = WordleGame("datasets/possible_words.csv")
+        pred = predictor.Predictor()
+        tqdm.write(f'Simulation #{i}: ')
+        tqdm.write(f'Actual word: {game.word}')
+        word = str()
+        step = 0
+        while True:
+            word = pred.predict()
+            tqdm.write(f'Guess{pred.trial}: {word}')
+            scores, end = game.play(word)
+            score = []
+            for i in scores:
+                if i == 1:
+                    score.append('🟨')
+                elif i == 0:
+                    score.append('⬜️')
+                elif i == 2:
+                    score.append('🟩')
+            tqdm.write(f'Scores: {score}')
+            if end:
+                tqdm.write(f'Tries: {pred.trial}')
+                steps.append(pred.trial)
+                break
+            pred.scores = scores
+            step += 1
+        tqdm.write(f'AVERAGE STEPS: {np.mean(steps)}')
+        pbar.update(1)
+
+# Creating Frequency Graph
+plt.hist(steps, bins=[1,2,3,4,5,6,7])
+plt.xlabel('Values')
+plt.ylabel('Frequency')
+plt.title('Frequency Graph')
+plt.show()
