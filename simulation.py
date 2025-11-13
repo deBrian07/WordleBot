@@ -5,7 +5,7 @@ import numpy as np
 from tqdm import tqdm
 import sys
 
-EPOCHS = 10000
+EPOCHS = 100
 
 steps = []
 with tqdm(total=EPOCHS, ncols=80) as pbar:
